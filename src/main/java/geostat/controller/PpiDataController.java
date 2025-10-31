@@ -4,10 +4,7 @@ import geostat.model.PpiDataRequestDto;
 import geostat.model.PpiDataResponseDto;
 import geostat.service.PpiDataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,7 +16,7 @@ public class PpiDataController {
 
     private PpiDataService ppiDataService;
 
-    @GetMapping("/getData")
+    @PostMapping("/getData")
     public List<PpiDataResponseDto> getData(@Valid @RequestBody PpiDataRequestDto ppiDataRequestDto) {
 
         Long surveyId = ppiDataRequestDto.getSurveyId();
