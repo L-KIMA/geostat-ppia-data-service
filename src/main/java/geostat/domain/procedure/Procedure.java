@@ -1,4 +1,4 @@
-package geostat.domain.sync;
+package geostat.domain.procedure;
 
 
 import javax.persistence.*;
@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sync_job", schema = "dbo", catalog = "KD")
-public class SyncJob {
+@Table(name = "questionnaire_procedure", schema = "dbo", catalog = "KD")
+public class Procedure {
 
     @Id
     @Column(name = "id")
@@ -16,14 +16,17 @@ public class SyncJob {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "year", nullable = false)
+    @Column(name = "year")
     private Integer year;
 
-    @Column(name = "quarter", nullable = false)
+    @Column(name = "quarter")
     private Integer quarter;
 
-    @Column(name = "survey_id")
-    private Integer surveyId;
+    @Column(name = "month")
+    private Integer month;
+
+    @Column(name = "survey_id", nullable = false)
+    private Long surveyId;
 
     @Column(name = "error_message")
     private String errorMessage;
@@ -43,7 +46,6 @@ public class SyncJob {
     @Column(name = "result")
     private Integer result;
 
-    // getters და setters
     public UUID getId() {
         return id;
     }
@@ -76,11 +78,11 @@ public class SyncJob {
         this.quarter = quarter;
     }
 
-    public Integer getSurveyId() {
+    public Long getSurveyId() {
         return surveyId;
     }
 
-    public void setSurveyId(Integer surveyId) {
+    public void setSurveyId(Long surveyId) {
         this.surveyId = surveyId;
     }
 
@@ -122,5 +124,13 @@ public class SyncJob {
 
     public void setResult(Integer result) {
         this.result = result;
+    }
+
+    public Integer getMonth() {
+        return month;
+    }
+
+    public void setMonth(Integer month) {
+        this.month = month;
     }
 }

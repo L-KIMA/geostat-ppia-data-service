@@ -1,0 +1,69 @@
+package geostat.service.procedure;
+
+import geostat.domain.procedure.Procedure;
+import geostat.model.procedure.ProcedureRequestDto;
+import geostat.model.procedure.ProcedureResponseDto;
+import geostat.model.procedure.ProcedureStatus;
+import geostat.repository.procedure.ProcedureStatusRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+@Service
+public class ProcedureService {
+
+    private final ProcedureStatusRepository procedureStatusRepository;
+    private final AsyncProcedureRunner asyncProcedureRunner;
+
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public ProcedureService(ProcedureStatusRepository procedureStatusRepository, AsyncProcedureRunner asyncProcedureRunner) {
+        this.procedureStatusRepository = procedureStatusRepository;
+        this.asyncProcedureRunner = asyncProcedureRunner;
+    }
+
+    @Transactional
+    public ProcedureResponseDto startSync(ProcedureRequestDto procedureRequestDto) {
+
+        Long surveyId = procedureRequestDto.getSurveyId();
+        Integer year = procedureRequestDto.getYear();
+        Integer quarter = procedureRequestDto.getQuarter();
+        Integer month = procedureRequestDto.getMonth();
+
+        UUID jobId = UUID.randomUUID();
+
+        Procedure job = new Procedure();
+        job.setId(jobId);
+        job.setStatus(ProcedureStatus.PENDING);
+        job.setSurveyId(surveyId);
+        job.setYear(year);
+        job.setQuarter(quarter);
+        job.setMonth(month);
+        job.setCreatedAt(new Date());
+        procedureStatusRepository.save(job);
+
+        asyncProcedureRunner.runProcedureAsync(procedureRequestDto, jobId);
+
+        return mapToProcedureResponseDto(job);
+    }
+
+    private ProcedureResponseDto mapToProcedureResponseDto(Procedure procedure) {
+
+        ProcedureResponseDto responseDto = new ProcedureResponseDto();
+
+        String startedAtStr = procedure.getStartedAt() != null ? sdf.format(procedure.getStartedAt()) : null;
+        String finishedAtStr = procedure.getFinishedAt() != null ? sdf.format(procedure.getFinishedAt()) : null;
+
+        responseDto.setJobId(procedure.getId().toString());
+        responseDto.setStatus(procedure.getStatus());
+        responseDto.setSurveyId(procedure.getSurveyId());
+        responseDto.setStartedAt(startedAtStr);
+        responseDto.setFinishedAt(finishedAtStr);
+        responseDto.setResult(procedure.getResult());
+
+        return responseDto;
+    }
+}

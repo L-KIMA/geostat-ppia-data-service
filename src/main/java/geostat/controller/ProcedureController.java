@@ -1,35 +1,33 @@
 package geostat.controller;
 
-import geostat.service.sync.ProcedureService;
+import geostat.model.procedure.ProcedureRequestDto;
+import geostat.model.procedure.ProcedureResponseDto;
+import geostat.service.procedure.ProcedureService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/procedure")
 public class ProcedureController {
 
-    @Autowired
     private ProcedureService procedureService;
 
-    @GetMapping("/call")
-    public ResponseEntity<Map<String, Object>> callTestProcedure(@RequestParam Integer surveyId,
-                                                                 @RequestParam Integer year,
-                                                                 @RequestParam Integer quarter) {
+    @PostMapping("/call")
+    public ResponseEntity<ProcedureResponseDto> callProcedure(@RequestBody @Validated ProcedureRequestDto procedureRequestDto) {
 
-        UUID jobId = procedureService.startSync(surveyId, year, quarter);
+        ProcedureResponseDto procedureResponseDto = procedureService.startSync(procedureRequestDto);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("jobId", jobId);
-        body.put("status", "PENDING");
+        return new ResponseEntity<>(procedureResponseDto, HttpStatus.OK);
+    }
 
-        return ResponseEntity.accepted().body(body);
+    @Autowired
+    public void setProcedureService(ProcedureService procedureService) {
+        this.procedureService = procedureService;
     }
 }
