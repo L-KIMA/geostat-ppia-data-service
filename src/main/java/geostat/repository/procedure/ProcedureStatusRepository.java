@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ProcedureStatusRepository extends JpaRepository<Procedure, UUID> {
+public interface ProcedureStatusRepository extends JpaRepository<Procedure, String> {
 
-    Optional<Procedure> getById(UUID uuid);
+    Optional<Procedure> getById(String uuid);
 }

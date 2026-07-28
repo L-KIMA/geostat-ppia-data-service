@@ -34,7 +34,7 @@ public class ProcedureService {
         Integer quarter = procedureRequestDto.getQuarter();
         Integer month = procedureRequestDto.getMonth();
 
-        UUID jobId = UUID.randomUUID();
+        String jobId = UUID.randomUUID().toString();
 
         Procedure job = new Procedure();
         job.setId(jobId);
@@ -45,6 +45,7 @@ public class ProcedureService {
         job.setMonth(month);
         job.setCreatedAt(new Date());
         procedureStatusRepository.save(job);
+        procedureStatusRepository.flush();
 
         asyncProcedureRunner.runProcedureAsync(procedureRequestDto, jobId);
 
@@ -53,8 +54,7 @@ public class ProcedureService {
 
     public ProcedureResponseDto getProcedureInfo(String id) {
 
-        UUID uuid = UUID.fromString(id);
-        Optional<Procedure> byId = procedureStatusRepository.getById(uuid);
+        Optional<Procedure> byId = procedureStatusRepository.getById(id);
 
         if (byId.isPresent()) {
 
@@ -73,7 +73,7 @@ public class ProcedureService {
         String startedAtStr = procedure.getStartedAt() != null ? sdf.format(procedure.getStartedAt()) : null;
         String finishedAtStr = procedure.getFinishedAt() != null ? sdf.format(procedure.getFinishedAt()) : null;
 
-        responseDto.setJobId(procedure.getId().toString());
+        responseDto.setJobId(procedure.getId());
         responseDto.setStatus(procedure.getStatus());
         responseDto.setSurveyId(procedure.getSurveyId());
         responseDto.setStartedAt(startedAtStr);

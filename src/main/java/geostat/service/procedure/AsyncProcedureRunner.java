@@ -18,17 +18,15 @@ import java.util.function.Function;
 @Component
 public class AsyncProcedureRunner {
 
-    private final ProcedureStatusRepository procedureStatusRepository;
-    private final JdbcTemplate jdbcTemplate;
-
-    public AsyncProcedureRunner(ProcedureStatusRepository procedureStatusRepository, JdbcTemplate jdbcTemplate) {
-        this.procedureStatusRepository = procedureStatusRepository;
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     private static final Map<Integer, Function<ProcContext, ProcCall>> REGISTRY = new HashMap<>();
 
     static {
+
+        //სატესტო
+        REGISTRY.put(17, c -> new ProcCall(
+                "{call [KD].[dbo].[Sync_Labour_formio](?, ?, ?, ?)}",
+                new Integer[]{c.getSurveyId(), c.getYear(), c.getQuarter()}, true));
+
         REGISTRY.put(14, c -> new ProcCall("{call [KD].[dbo].[Sync_Bes_Fin_formio](?)}",
                 new Integer[]{c.getYear()}, true));
 
@@ -77,9 +75,6 @@ public class AsyncProcedureRunner {
         REGISTRY.put(49, c -> new ProcCall("{call [KD].[dbo].[Sync_INOVA_new](?, ?)}",
                 new Integer[]{c.getYear(), c.getSurveyId()}, true));
 
-        REGISTRY.put(17, c -> new ProcCall("{call [KD].[dbo].[Sync_Labour_formio](?, ?, ?)}",
-                new Integer[]{c.getSurveyId(), c.getYear(), c.getQuarter()}, true));
-
         REGISTRY.put(19, c -> new ProcCall("{call [KD].[dbo].[Sync_NEC_formio](?)}",
                 new Integer[]{c.getYear()}, true));
 
@@ -99,8 +94,16 @@ public class AsyncProcedureRunner {
                 new Integer[]{c.getYear()}, true));
     }
 
+    private final ProcedureStatusRepository procedureStatusRepository;
+    private final JdbcTemplate jdbcTemplate;
+
+    public AsyncProcedureRunner(ProcedureStatusRepository procedureStatusRepository, JdbcTemplate jdbcTemplate) {
+        this.procedureStatusRepository = procedureStatusRepository;
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     @Async("procedureExecutor")
-    public void runProcedureAsync(ProcedureRequestDto procedureRequestDto, UUID jobId) {
+    public void runProcedureAsync(ProcedureRequestDto procedureRequestDto, String jobId) {
 
         int surveyId = procedureRequestDto.getSurveyId().intValue();
         Integer year = procedureRequestDto.getYear();
