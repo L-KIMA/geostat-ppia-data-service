@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -50,6 +51,21 @@ public class ProcedureService {
         return mapToProcedureResponseDto(job);
     }
 
+    public ProcedureResponseDto getProcedureInfo(String id) {
+
+        UUID uuid = UUID.fromString(id);
+        Optional<Procedure> byId = procedureStatusRepository.getById(uuid);
+
+        if (byId.isPresent()) {
+
+            Procedure procedure = byId.get();
+
+            return mapToProcedureResponseDto(procedure);
+        }
+
+        return null;
+    }
+
     private ProcedureResponseDto mapToProcedureResponseDto(Procedure procedure) {
 
         ProcedureResponseDto responseDto = new ProcedureResponseDto();
@@ -63,6 +79,10 @@ public class ProcedureService {
         responseDto.setStartedAt(startedAtStr);
         responseDto.setFinishedAt(finishedAtStr);
         responseDto.setResult(procedure.getResult());
+        responseDto.setYear(procedure.getYear());
+        responseDto.setQuarter(procedure.getQuarter());
+        responseDto.setMonth(procedure.getMonth());
+        responseDto.setErrorMessage(procedure.getErrorMessage());
 
         return responseDto;
     }

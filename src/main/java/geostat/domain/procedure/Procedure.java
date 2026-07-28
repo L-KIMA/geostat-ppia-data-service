@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "questionnaire_procedure", schema = "dbo", catalog = "KD")
+@Table(name = "questionnaire_procedure_call_history", schema = "dbo", catalog = "KD")
 public class Procedure {
 
     @Id
