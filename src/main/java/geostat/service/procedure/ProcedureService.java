@@ -16,10 +16,9 @@ import java.util.UUID;
 @Service
 public class ProcedureService {
 
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final ProcedureStatusRepository procedureStatusRepository;
     private final AsyncProcedureRunner asyncProcedureRunner;
-
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public ProcedureService(ProcedureStatusRepository procedureStatusRepository, AsyncProcedureRunner asyncProcedureRunner) {
         this.procedureStatusRepository = procedureStatusRepository;
@@ -36,6 +35,8 @@ public class ProcedureService {
 
         String jobId = UUID.randomUUID().toString();
 
+        Date crateTime = new Date();
+
         Procedure job = new Procedure();
         job.setId(jobId);
         job.setStatus(ProcedureStatus.PENDING);
@@ -43,7 +44,9 @@ public class ProcedureService {
         job.setYear(year);
         job.setQuarter(quarter);
         job.setMonth(month);
-        job.setCreatedAt(new Date());
+        job.setCreatedAt(crateTime);
+        job.setStartedAt(crateTime);
+
         procedureStatusRepository.save(job);
         procedureStatusRepository.flush();
 
